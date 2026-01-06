@@ -9,17 +9,17 @@ export default function LevelOne() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-green-100 p-6">
       <h1 className="text-3xl font-bold text-blue-800 mb-8 text-center">
-        SparshDnyan – Know Your Body
+        स्पर्शज्ञान – तुमचे शरीर ओळखा
       </h1>
 
       <div className="flex flex-col md:flex-row items-center justify-center gap-12">
 
-        {/* LEFT */}
+        {/* डावीकडे */}
         <div className="flex justify-center w-full md:w-1/2">
           <Body step={step} />
         </div>
 
-        {/* RIGHT */}
+        {/* उजवीकडे */}
         <div className="flex flex-col items-center w-full md:w-1/2 gap-6">
           <InfoCard step={step} />
           <NextButton step={step} setStep={setStep} />
