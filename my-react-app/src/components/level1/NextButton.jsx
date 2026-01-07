@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function NextButton({ step, setStep }) {
+export default function NextButton({ step, setStep, isPortrait }) {
   const [showCompletionModal, setShowCompletionModal] = useState(false);
-  const navigate = useNavigate(); // ✅ correct hook
+  const navigate = useNavigate();
 
   const handleClick = () => {
     if (step < 3) {
       setStep((prev) => prev + 1);
-    } else {
+    } else if (step === 3) {
       setShowCompletionModal(true);
     }
   };
@@ -19,22 +19,34 @@ export default function NextButton({ step, setStep }) {
 
   const handleNextLevel = () => {
     setShowCompletionModal(false);
-    navigate("/level2"); // ✅ correct navigation
+   
+    alert("पुढील पातळीकडे जात आहे...");
+     navigate('/level2')
   };
 
   const getButtonText = () => {
-    return step < 3 ? "पुढे" : "पातळी पूर्ण";
+    if (step < 3) {
+      return "पुढे";
+    } else if (step === 3) {
+      return "पातळी पूर्ण";
+    }
+  };
+
+  const getButtonClass = () => {
+    const baseClass = "w-full text-white font-bold rounded-lg shadow hover:opacity-90 transition-all duration-300";
+    
+    if (isPortrait) {
+      return `${baseClass} px-4 py-3 text-sm ${step < 3 ? 'bg-green-600' : 'bg-blue-600 animate-pulse'}`;
+    }
+    
+    return `${baseClass} px-6 py-3 text-base ${step < 3 ? 'bg-green-600' : 'bg-blue-600 animate-pulse'}`;
   };
 
   return (
     <>
       <button
         onClick={handleClick}
-        className={`mt-6 px-8 py-3 text-white text-lg font-bold rounded-full shadow-lg hover:scale-105 transition-all duration-300 ${
-          step < 3
-            ? "bg-green-600 hover:bg-green-700"
-            : "bg-blue-600 hover:bg-blue-700 animate-pulse"
-        }`}
+        className={getButtonClass()}
       >
         {getButtonText()}
       </button>
@@ -42,27 +54,25 @@ export default function NextButton({ step, setStep }) {
       {/* Completion Modal */}
       {showCompletionModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-gradient-to-r from-green-300 via-yellow-300 to-orange-300 p-8 rounded-3xl shadow-2xl max-w-md mx-4 animate-scaleIn">
+          <div className="bg-white p-4 rounded-xl shadow-2xl max-w-xs mx-3 w-full">
             <div className="text-center">
-              <div className="text-6xl mb-4 animate-bounce">🎉</div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              <div className="text-5xl mb-3">🎉</div>
+              <h2 className="text-lg font-bold text-gray-800 mb-3">
                 अभिनंदन! 🏆
               </h2>
-              <p className="text-lg text-gray-700 mb-6">
+              <p className="text-sm text-gray-700 mb-4">
                 तुम्ही ही पातळी यशस्वीरित्या पूर्ण केली!
               </p>
-
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-2">
                 <button
                   onClick={handleNextLevel}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:scale-105 transition"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg text-sm"
                 >
                   पुढील पातळी
                 </button>
-
                 <button
                   onClick={handleCloseModal}
-                  className="flex-1 px-6 py-3 bg-gray-700 text-white font-bold rounded-xl hover:scale-105 transition"
+                  className="px-4 py-2 bg-gray-600 text-white font-bold rounded-lg text-sm"
                 >
                   बंद करा
                 </button>

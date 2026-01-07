@@ -1,4 +1,4 @@
-export default function InfoCard({ step }) {
+export default function InfoCard({ step, isPortrait }) {
   const steps = [
     {
       title: "डोके",
@@ -19,20 +19,31 @@ export default function InfoCard({ step }) {
   ];
 
   return (
-    <div className="relative bg-white shadow-xl rounded-2xl p-6 max-w-md border-4 border-green-400">
+    <div className={`relative bg-white shadow-md rounded-xl p-3 ${isPortrait ? 'border-2' : 'border-3'} border-green-400 h-full flex flex-col`}>
 
-      {/* बाण */}
-      <div className="absolute -left-8 top-1/2 -translate-y-1/2 text-4xl animate-bounce">
-        👉
-      </div>
+      {/* Arrow indicator */}
+      {!isPortrait && (
+        <div className="absolute -left-6 top-1/2 -translate-y-1/2 text-3xl">
+          👉
+        </div>
+      )}
 
-      <h2 className="text-xl font-semibold text-green-700 mb-2 text-center">
+      <h2 className="text-sm sm:text-base font-semibold text-green-700 mb-1 text-center">
         {steps[step-1].title}
       </h2>
 
-      <p className="text-gray-700 text-lg text-center">
-        {steps[step-1].text}
-      </p>
+      <div className="flex-1 flex items-center">
+        <p className="text-gray-700 text-xs sm:text-sm text-center leading-tight">
+          {steps[step-1].text}
+        </p>
+      </div>
+      
+      {/* Step indicator */}
+      <div className="mt-2 text-center">
+        <div className="inline-block bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold">
+          माहिती {step} / 4
+        </div>
+      </div>
     </div>
   );
 }

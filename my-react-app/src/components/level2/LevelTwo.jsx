@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+import NextLevel from './NextLevel';
+
 const Level2 = ({ onLevelComplete }) => {
   const [step, setStep] = useState(1); // 1: Create circle, 2: Test touch safety
   const [selectedPeople, setSelectedPeople] = useState([]);
@@ -12,6 +15,11 @@ const Level2 = ({ onLevelComplete }) => {
   const [touchResults, setTouchResults] = useState({});
   const [currentBodyPart, setCurrentBodyPart] = useState(null);
   const [testingComplete, setTestingComplete] = useState(false);
+
+
+  function handleClick(){
+      useNavigate('/level3')
+  }
 
   // Body parts with safety information
   const bodyParts = [
@@ -764,6 +772,8 @@ const Level2 = ({ onLevelComplete }) => {
             </div>
           </div>
         )}
+
+      <NextLevel/>
 
         {/* Global Actions */}
         <div className="mt-4 flex justify-between items-center">
