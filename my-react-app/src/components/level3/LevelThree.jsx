@@ -150,7 +150,9 @@ const LevelThree = ({ onLevelComplete }) => {
         </div>
       </div>
     </div>
+     </div>
   );
+ 
 };
 
 export default LevelThree;
