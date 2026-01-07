@@ -42,7 +42,7 @@ const Level2 = ({ onLevelComplete }) => {
     { id: 5, name: 'भाऊ', emoji: '👦', relationship: 'family' },
     { id: 6, name: 'बहीण', emoji: '👧', relationship: 'family' },
     { id: 7, name: 'शेजारी', emoji: '🧑', relationship: 'stranger' },
-    { id: 8, name: 'शपाई', emoji: '💂', relationship: 'guard' },
+    { id: 8, name: 'शिपाई', emoji: '💂', relationship: 'guard' },
     { id: 9, name: 'शिक्षक', emoji: '👩‍🏫', relationship: 'teacher' },
     { id: 10, name: 'मित्र', emoji: '🧒', relationship: 'friends' },
     { id: 11, name: 'अनोळखी', emoji: '🙍', relationship: 'stranger' },

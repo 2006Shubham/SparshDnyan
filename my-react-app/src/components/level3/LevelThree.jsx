@@ -58,28 +58,26 @@ const LevelThree = ({ onLevelComplete }) => {
               />
               
               {/* Fallback UI if image doesn't exist */}
-              {error ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  <div className="text-6xl mb-4">🖼️</div>
-                  <div className="text-2xl font-bold text-purple-800 mb-2">Image Preview</div>
-                  <div className="text-gray-600 mb-4">Placeholder for main illustration</div>
-                  <div className="bg-white/80 p-4 rounded-lg">
-                    <p className="text-red-600 font-medium">{error}</p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Expected image path: <code className="bg-gray-100 px-2 py-1 rounded">{imagePath}</code>
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                // Loading skeleton
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-pulse">
-                    <div className="text-6xl mb-4">⏳</div>
-                    <div className="text-gray-600">Loading image...</div>
-                  </div>
-                </div>
-              )}
-            </div>
+{error && (
+  <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
+    <div className="text-6xl mb-4">🖼️</div>
+    <div className="text-2xl font-bold text-purple-800 mb-2">
+      Image Preview
+    </div>
+    <div className="text-gray-600 mb-4">
+      Placeholder for main illustration
+    </div>
+    <div className="bg-white/80 p-4 rounded-lg">
+      <p className="text-red-600 font-medium">{error}</p>
+      <p className="text-sm text-gray-600 mt-2">
+        Expected image path:
+        <code className="bg-gray-100 px-2 py-1 rounded">
+          {imagePath}
+        </code>
+      </p>
+    </div>
+  </div>
+)}
             
             {/* Image Info Overlay */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
