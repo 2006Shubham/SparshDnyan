@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NextLevel from './NextLevel';
 
+import faithCircleAudio from "../../assets/audio/faithcircle.mp3";
+
+
 const Level2 = ({ onLevelComplete }) => {
   const [step, setStep] = useState(1); // 1: Create circle, 2: Test touch safety
   const [selectedPeople, setSelectedPeople] = useState([]);
@@ -20,6 +23,17 @@ const Level2 = ({ onLevelComplete }) => {
   function handleClick(){
       useNavigate('/level3')
   }
+
+  const audioRef = React.useRef(null);
+
+const playAudio = () => {
+  if (audioRef.current) {
+    audioRef.current.pause();     // restart audio
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
+  }
+};
+
 
   // Body parts with safety information
   const bodyParts = [
@@ -42,7 +56,7 @@ const Level2 = ({ onLevelComplete }) => {
     { id: 5, name: 'भाऊ', emoji: '👦', relationship: 'family' },
     { id: 6, name: 'बहीण', emoji: '👧', relationship: 'family' },
     { id: 7, name: 'शेजारी', emoji: '🧑', relationship: 'stranger' },
-    { id: 8, name: 'शिपाई', emoji: '💂', relationship: 'guard' },
+    { id: 8, name: 'शपाई', emoji: '💂', relationship: 'guard' },
     { id: 9, name: 'शिक्षक', emoji: '👩‍🏫', relationship: 'teacher' },
     { id: 10, name: 'मित्र', emoji: '🧒', relationship: 'friends' },
     { id: 11, name: 'अनोळखी', emoji: '🙍', relationship: 'stranger' },
@@ -778,11 +792,13 @@ const Level2 = ({ onLevelComplete }) => {
         {/* Global Actions */}
         <div className="mt-4 flex justify-between items-center">
           <button
-            onClick={() => setShowInstructions(true)}
+            onClick={playAudio}
             className="text-sm text-purple-600 hover:text-purple-800"
           >
-            ℹ️ सूचना पहा
+            🔊 ऐका
           </button>
+          <audio ref={audioRef} src={faithCircleAudio} />
+
           
           <div className="text-xs text-gray-500">
             COEP Sparshadhyan प्रकल्प
