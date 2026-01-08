@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import info5 from "../../assets/audio/info5.mp3"
+import { useNavigate } from "react-router-dom";
 const LevelFive = () => {
 
   const [currentSection, setCurrentSection] = useState("intro");
@@ -7,6 +8,7 @@ const LevelFive = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
 
 
 
@@ -730,20 +732,10 @@ const LevelFive = () => {
 
         <div className="space-y-3">
           <button
-            onClick={() => {
-              setCurrentSection("intro");
-              setFlippedCards([]);
-              setSelectedAnswer(null);
-            }}
-            className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-full hover:scale-105 transition-transform"
-          >
-            पुन्हा खेळा 🔄
-          </button>
-          <button
-            onClick={() => window.history.back()}
+            onClick={()=>{navigate('/')}}
             className="w-full px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-800 text-white font-bold rounded-full hover:scale-105 transition-transform"
           >
-            मुख्य पृष्ठ 🏠
+            पुन्हा खेळा 🔄🏠
           </button>
         </div>
       </div>
