@@ -821,9 +821,8 @@ const LevelFive = () => {
 
       {/* Footer */}
       <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
-        <p>COEP स्पर्शज्ञान प्रकल्प • बाल सुरक्षा शिक्षण क्विझ</p>
-        <p className="mt-1">ज्ञान आहे तर सुरक्षा आहे!</p>
-      </div>
+          <p>COEP Sparshadhyan प्रकल्प • Child Safety Education Platform</p>
+        </div>
 
       {/* Mobile-specific styles */}
       <style jsx>{`

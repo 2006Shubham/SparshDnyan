@@ -848,9 +848,10 @@ const Level2 = ({ onLevelComplete }) => {
 
           <audio ref={audioRef} src={audioSrc} />
 
-          <div className="text-xs text-gray-500">
-            COEP Sparshadhyan प्रकल्प
-          </div>
+        </div>
+        
+           <div className="mt-8 pt-6 border-t border-gray-200 flex-row text-center text-gray-500 text-sm justify-center  items-center">
+          <p>COEP Sparshadhyan प्रकल्प • Child Safety Education Platform</p>
         </div>
       </div>
     </div>

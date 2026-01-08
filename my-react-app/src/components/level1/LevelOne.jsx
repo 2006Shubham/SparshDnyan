@@ -109,6 +109,8 @@ export default function LevelOne() {
           </div>
         </div>
 
+        
+
         {/* Controls */}
         {!showGetStarted && (
           <div className={`flex flex-col ${isPortrait ? "gap-2 w-full" : "gap-3 w-56 lg:w-64"} flex-shrink-0`}>
@@ -121,6 +123,10 @@ export default function LevelOne() {
           </div>
         )}
       </div>
+
+      
     </div>
+
+
   );
 }
