@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NextLevel from './NextLevel';
 import faithCircleAudio from "../../assets/audio/faithcircle.mp3";
-import head from "../../assets/audio/testTouch.mp3";
+import testTouch from "../../assets/audio/testTouch.mp3";
 
 const Level2 = ({ onLevelComplete }) => {
   const navigate = useNavigate();
+  
   
   const [audioSrc, setAudioSrc] = useState(faithCircleAudio);
   const [step, setStep] = useState(1); // 1: Create circle, 2: Test touch safety
@@ -45,7 +46,7 @@ const Level2 = ({ onLevelComplete }) => {
     }).length;
 
     // 👇 NEW PART (only this is added)
-    setAudioSrc(head);
+    setAudioSrc(testTouch);
 
     if (audioRef.current) {
       audioRef.current.pause();

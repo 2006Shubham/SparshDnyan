@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import info5 from "../../assets/audio/info5.mp3"
 const LevelFive = () => {
+
   const [currentSection, setCurrentSection] = useState("intro");
   const [flippedCards, setFlippedCards] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -8,15 +9,16 @@ const LevelFive = () => {
   const [isMobile, setIsMobile] = useState(false);
 
 
+
   const audioRef = React.useRef(null);
-  
-    const playAudio = () => {
-      if (audioRef.current) {
-        audioRef.current.pause();     // restart audio
-        audioRef.current.currentTime = 0;
-        audioRef.current.play();
-      }
-    };
+
+  const playAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();     // restart audio
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    }
+  };
 
   // Detect mobile screen
   useEffect(() => {
@@ -228,7 +230,7 @@ const LevelFive = () => {
       <div className="mb-6">
         <div className="text-6xl mb-4 animate-bounce">👩‍🏫</div>
         <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-2">
-            सुरक्षा शिकूया!
+          सुरक्षा शिकूया!
         </h1>
         <p className="text-gray-600">
           "घेऊया शिक्षणाचे धन, रोग अज्ञानापासून लांब"
@@ -274,6 +276,8 @@ const LevelFive = () => {
 
   // Render Private Parts Section
   const renderPrivateParts = () => (
+
+
     <div className="h-full flex flex-col p-4">
       <h1 className="text-xl sm:text-2xl font-bold text-blue-800 text-center mb-4">
         तुमचे शरीर - तुमचा अधिकार 👤
@@ -287,18 +291,16 @@ const LevelFive = () => {
           {privatePartsInfo.map((part, index) => (
             <div
               key={index}
-              className={`flex flex-col items-center p-3 rounded-xl ${
-                part.private
+              className={`flex flex-col items-center p-3 rounded-xl ${part.private
                   ? part.warning
                     ? 'bg-red-50 border-2 border-red-300'
                     : 'bg-pink-50 border-2 border-pink-300'
                   : 'bg-blue-50 border-2 border-blue-200'
-              }`}
+                }`}
             >
               <div className="text-3xl mb-2">{part.emoji}</div>
-              <h3 className={`font-bold text-sm text-center ${
-                part.private ? 'text-red-700' : 'text-blue-700'
-              }`}>
+              <h3 className={`font-bold text-sm text-center ${part.private ? 'text-red-700' : 'text-blue-700'
+                }`}>
                 {part.name}
               </h3>
               <p className="text-xs text-gray-600 text-center mt-1">
@@ -357,9 +359,8 @@ const LevelFive = () => {
             <div
               key={card.id}
               onClick={() => handleCardFlip(card.id)}
-              className={`cursor-pointer transition-all duration-300 ${
-                flippedCards.includes(card.id) ? 'opacity-75' : ''
-              }`}
+              className={`cursor-pointer transition-all duration-300 ${flippedCards.includes(card.id) ? 'opacity-75' : ''
+                }`}
             >
               <div className={`bg-gradient-to-r ${card.color} rounded-xl p-4 shadow-lg`}>
                 <div className="flex items-center gap-3">
@@ -411,7 +412,11 @@ const LevelFive = () => {
 
   // Render POCSO Law Section
   const renderPOCSOLaw = () => (
+
+
+
     <div className="h-full flex flex-col p-4">
+
       <h1 className="text-xl sm:text-2xl font-bold text-blue-800 text-center mb-4">
         {pocsoInfo.title} {pocsoInfo.emoji}
       </h1>
@@ -485,6 +490,9 @@ const LevelFive = () => {
 
   // Render Help Numbers Section
   const renderHelpNumbers = () => (
+
+
+
     <div className="h-full flex flex-col p-4">
       <h1 className="text-xl sm:text-2xl font-bold text-blue-800 text-center mb-4">
         मदत क्रमांक - तुमची सुरक्षा 📞
@@ -599,27 +607,25 @@ const LevelFive = () => {
 
         <div className="space-y-3 mb-6">
           <h3 className="font-bold text-gray-800">तुम्ही काय कराल?</h3>
-          
+
           {scenarios[0].options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswerSelect(index)}
-              className={`w-full text-left p-3 rounded-lg transition-all duration-300 ${
-                selectedAnswer === index
+              className={`w-full text-left p-3 rounded-lg transition-all duration-300 ${selectedAnswer === index
                   ? option.correct
                     ? 'bg-green-100 border-2 border-green-400'
                     : 'bg-red-100 border-2 border-red-400'
                   : 'bg-white hover:bg-gray-50 border border-gray-200'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                  selectedAnswer === index
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedAnswer === index
                     ? option.correct
                       ? 'bg-green-500 text-white'
                       : 'bg-red-500 text-white'
                     : 'bg-gray-200'
-                }`}>
+                  }`}>
                   {selectedAnswer === index && (option.correct ? '✓' : '✗')}
                 </div>
                 <span className="font-medium">{option.text}</span>
@@ -629,11 +635,10 @@ const LevelFive = () => {
         </div>
 
         {showFeedback && selectedAnswer !== null && (
-          <div className={`rounded-xl p-4 mb-4 animate-pulse ${
-            scenarios[0].options[selectedAnswer].correct
+          <div className={`rounded-xl p-4 mb-4 animate-pulse ${scenarios[0].options[selectedAnswer].correct
               ? 'bg-green-50 border border-green-200'
               : 'bg-red-50 border border-red-200'
-          }`}>
+            }`}>
             <div className="flex items-center gap-2">
               <span className="text-xl">
                 {scenarios[0].options[selectedAnswer].correct ? '🏆' : '💡'}
@@ -688,17 +693,17 @@ const LevelFive = () => {
           <div className="absolute -top-2 -right-4 text-4xl">🛡️</div>
           <div className="absolute -bottom-2 -left-4 text-4xl">🌟</div>
         </div>
-        
+
         <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-4">
           तू शूर आहेस! 💪
         </h1>
-        
+
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-5 mb-6 border-2 border-purple-200">
           <p className="text-lg text-gray-800 mb-3 font-bold">
             "तू शूर आहेस, कायदा तुझ्यासोबत आहे."
           </p>
           <p className="text-gray-600 text-sm">
-            आता तुला माहिती आहे की तू एकटी नाहीस 
+            आता तुला माहिती आहे की तू एकटी नाहीस
             आणि मदत नेहमी उपलब्ध आहे.
           </p>
         </div>
@@ -760,7 +765,7 @@ const LevelFive = () => {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 overflow-hidden"
       style={{ minHeight: '100vh' }}
     >
@@ -777,10 +782,10 @@ const LevelFive = () => {
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-1">
-              <div 
+              <div
                 className="bg-gradient-to-r from-green-400 to-blue-500 h-1 rounded-full transition-all duration-500"
-                style={{ 
-                  width: `${((Object.keys(sections).indexOf(currentSection)) / (Object.keys(sections).length - 2)) * 100}%` 
+                style={{
+                  width: `${((Object.keys(sections).indexOf(currentSection)) / (Object.keys(sections).length - 2)) * 100}%`
                 }}
               ></div>
             </div>
@@ -800,7 +805,8 @@ const LevelFive = () => {
         </div>
       </div>
 
-          <div className="mt-4 ml-4 flex justify-between items-center">
+      {currentSection === "intro" && (
+        <div className="mt-4 ml-4 flex justify-between items-center">
           <button
             onClick={playAudio}
             className="text-sm text-purple-600 hover:text-purple-800"
@@ -809,14 +815,15 @@ const LevelFive = () => {
           </button>
 
           <audio ref={audioRef} src={info5} />
-
-          </div>
-
-       {/* Footer */}
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
-          <p>COEP स्पर्शज्ञान प्रकल्प • बाल सुरक्षा शिक्षण क्विझ</p>
-          <p className="mt-1">ज्ञान आहे तर सुरक्षा आहे!</p>
         </div>
+      )}
+
+
+      {/* Footer */}
+      <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
+        <p>COEP स्पर्शज्ञान प्रकल्प • बाल सुरक्षा शिक्षण क्विझ</p>
+        <p className="mt-1">ज्ञान आहे तर सुरक्षा आहे!</p>
+      </div>
 
       {/* Mobile-specific styles */}
       <style jsx>{`
