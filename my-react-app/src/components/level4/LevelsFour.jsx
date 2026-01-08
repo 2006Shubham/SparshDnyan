@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import quiz from "../../assets/audio/quiz.mp3"
 const LevelFour = ({ onLevelComplete }) => {
   const [step, setStep] = useState(1); // 1: Select person, 2: Quiz, 3: Results
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -10,6 +11,17 @@ const LevelFour = ({ onLevelComplete }) => {
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
   const [quizCompleted, setQuizCompleted] = useState(false);
     const navigate = useNavigate();
+
+
+    const audioRef = React.useRef(null);
+      
+        const playAudio = () => {
+          if (audioRef.current) {
+            audioRef.current.pause();     // restart audio
+            audioRef.current.currentTime = 0;
+            audioRef.current.play();
+          }
+        };
 
   function handleClick(){
         navigate('/level5')
@@ -681,6 +693,18 @@ const LevelFour = ({ onLevelComplete }) => {
             </div>
           </div>
         )}
+
+            <div className="mt-4 flex justify-between items-center">
+                  <button
+                    onClick={playAudio}
+                    className="text-sm text-purple-600 hover:text-purple-800"
+                  >
+                    🔊 ऐका
+                  </button>
+        
+                  <audio ref={audioRef} src={quiz} />
+        
+                  </div>
 
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">

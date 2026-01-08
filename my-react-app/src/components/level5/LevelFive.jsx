@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
-
+import info5 from "../../assets/audio/info5.mp3"
 const LevelFive = () => {
   const [currentSection, setCurrentSection] = useState("intro");
   const [flippedCards, setFlippedCards] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+
+  const audioRef = React.useRef(null);
+  
+    const playAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.pause();     // restart audio
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+    };
 
   // Detect mobile screen
   useEffect(() => {
@@ -217,7 +228,7 @@ const LevelFive = () => {
       <div className="mb-6">
         <div className="text-6xl mb-4 animate-bounce">👩‍🏫</div>
         <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-2">
-          घेऊन शिकूया सुरक्षा!
+            सुरक्षा शिकूया!
         </h1>
         <p className="text-gray-600">
           "घेऊया शिक्षणाचे धन, रोग अज्ञानापासून लांब"
@@ -788,6 +799,24 @@ const LevelFive = () => {
           </p>
         </div>
       </div>
+
+          <div className="mt-4 ml-4 flex justify-between items-center">
+          <button
+            onClick={playAudio}
+            className="text-sm text-purple-600 hover:text-purple-800"
+          >
+            🔊 ऐका
+          </button>
+
+          <audio ref={audioRef} src={info5} />
+
+          </div>
+
+       {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
+          <p>COEP स्पर्शज्ञान प्रकल्प • बाल सुरक्षा शिक्षण क्विझ</p>
+          <p className="mt-1">ज्ञान आहे तर सुरक्षा आहे!</p>
+        </div>
 
       {/* Mobile-specific styles */}
       <style jsx>{`
