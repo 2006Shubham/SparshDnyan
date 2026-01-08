@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import NextLevel from './NextLevel';
-
 import faithCircleAudio from "../../assets/audio/faithcircle.mp3";
-
+import head from "../../assets/audio/testTouch.mp3";
 
 const Level2 = ({ onLevelComplete }) => {
+  const navigate = useNavigate();
+  
+  const [audioSrc, setAudioSrc] = useState(faithCircleAudio);
   const [step, setStep] = useState(1); // 1: Create circle, 2: Test touch safety
   const [selectedPeople, setSelectedPeople] = useState([]);
   const [feedback, setFeedback] = useState('');
@@ -19,157 +20,38 @@ const Level2 = ({ onLevelComplete }) => {
   const [currentBodyPart, setCurrentBodyPart] = useState(null);
   const [testingComplete, setTestingComplete] = useState(false);
 
-
-  function handleClick(){
-      useNavigate('/level3')
-  }
-
   const audioRef = React.useRef(null);
 
-const playAudio = () => {
-  if (audioRef.current) {
-    audioRef.current.pause();     // restart audio
-    audioRef.current.currentTime = 0;
-    audioRef.current.play();
+  function handleClick() {
+    navigate('/level3');
   }
-};
 
-
-  // Body parts with safety information
-  const bodyParts = [
-    { id: 'head', name: 'डोके', emoji: '🧠', safeFor: ['family', 'doctor'], isSensitive: false },
-    { id: 'shoulder', name: 'खांदा', emoji: '💪', safeFor: ['family', 'friends', 'teacher'], isSensitive: false },
-    { id: 'chest', name: 'छाती', emoji: '❤️', safeFor: ['family', 'doctor'], isSensitive: true },
-    { id: 'stomach', name: 'पोट', emoji: '🩹', safeFor: ['family', 'doctor'], isSensitive: true },
-    { id: 'arm', name: 'हात', emoji: '🤚', safeFor: ['family', 'friends', 'teacher', 'guard'], isSensitive: false },
-    { id: 'leg', name: 'पाय', emoji: '🦵', safeFor: ['family', 'friends', 'teacher', 'guard'], isSensitive: false },
-    { id: 'private', name: 'खाजगी भाग', emoji: '🛡️', safeFor: ['doctor'], isSensitive: true },
-    { id: 'back', name: 'पाठ', emoji: '🔙', safeFor: ['family', 'doctor'], isSensitive: true },
-  ];
-
-  // People with their relationship types
-  const people = [
-    { id: 1, name: 'आई', emoji: '👩', relationship: 'family' },
-    { id: 2, name: 'वडील', emoji: '👨', relationship: 'family' },
-    { id: 3, name: 'आजी', emoji: '👵', relationship: 'family' },
-    { id: 4, name: 'आजोबा', emoji: '👴', relationship: 'family' },
-    { id: 5, name: 'भाऊ', emoji: '👦', relationship: 'family' },
-    { id: 6, name: 'बहीण', emoji: '👧', relationship: 'family' },
-    { id: 7, name: 'शेजारी', emoji: '🧑', relationship: 'stranger' },
-    { id: 8, name: 'शपाई', emoji: '💂', relationship: 'guard' },
-    { id: 9, name: 'शिक्षक', emoji: '👩‍🏫', relationship: 'teacher' },
-    { id: 10, name: 'मित्र', emoji: '🧒', relationship: 'friends' },
-    { id: 11, name: 'अनोळखी', emoji: '🙍', relationship: 'stranger' },
-    { id: 12, name: 'डॉक्टर', emoji: '👩‍⚕️', relationship: 'doctor' },
-  ];
-
-  // Touch safety rules - Detailed rules for each person
-  const touchRules = {
-    'आई': {
-      safe: ['head', 'shoulder', 'chest', 'stomach', 'arm', 'leg', 'back'],
-      unsafe: ['private'],
-      description: 'आईचा स्पर्श बहुतेक भागांवर सुरक्षित आहे, पण खाजगी भागांवर नाही.',
-      safeExplanation: 'आई तुमच्या काळजीसाठी स्पर्श करू शकते.',
-      unsafeExplanation: 'खाजगी भागांवर कोणाचाही स्पर्श स्वीकार्य नाही.'
-    },
-    'वडील': {
-      safe: ['head', 'shoulder', 'arm', 'leg'],
-      unsafe: ['chest', 'stomach', 'private', 'back'],
-      description: 'वडिलांचा स्पर्श काही भागांवर सुरक्षित आहे.',
-      safeExplanation: 'वडील तुमचे मार्गदर्शन करण्यासाठी स्पर्श करू शकतात.',
-      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
-    },
-    'आजी': {
-      safe: ['head', 'shoulder', 'arm', 'leg', 'back'],
-      unsafe: ['chest', 'stomach', 'private'],
-      description: 'आजीचा स्पर्श बहुतेक भागांवर सुरक्षित आहे.',
-      safeExplanation: 'आजी तुमची काळजी घेण्यासाठी स्पर्श करू शकते.',
-      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
-    },
-    'आजोबा': {
-      safe: ['head', 'shoulder', 'arm', 'leg'],
-      unsafe: ['chest', 'stomach', 'private', 'back'],
-      description: 'आजोबांचा स्पर्श काही भागांवर सुरक्षित आहे.',
-      safeExplanation: 'आजोबा तुमचे मार्गदर्शन करण्यासाठी स्पर्श करू शकतात.',
-      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
-    },
-    'भाऊ': {
-      safe: ['shoulder', 'arm', 'leg'],
-      unsafe: ['head', 'chest', 'stomach', 'private', 'back'],
-      description: 'भावाचा स्पर्श मर्यादित भागांवर सुरक्षित आहे.',
-      safeExplanation: 'भाऊ खेळण्यासाठी किंवा मदतीसाठी स्पर्श करू शकतो.',
-      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
-    },
-    'बहीण': {
-      safe: ['head', 'shoulder', 'arm', 'leg', 'back'],
-      unsafe: ['chest', 'stomach', 'private'],
-      description: 'बहिणीचा स्पर्श बहुतेक भागांवर सुरक्षित आहे.',
-      safeExplanation: 'बहीण तुमची मदत करण्यासाठी स्पर्श करू शकते.',
-      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
-    },
-    'शेजारी': {
-      safe: [],
-      unsafe: ['head', 'shoulder', 'chest', 'stomach', 'arm', 'leg', 'private', 'back'],
-      description: 'शेजाऱ्यांचा कोणताही स्पर्श सुरक्षित नाही.',
-      safeExplanation: '',
-      unsafeExplanation: 'अपरिचित व्यक्तींचा स्पर्श नेहमी धोकादायक.'
-    },
-    'शपाई': {
-      safe: ['arm'],
-      unsafe: ['head', 'shoulder', 'chest', 'stomach', 'leg', 'private', 'back'],
-      description: 'रक्षकांचा स्पर्श फक्त आपत्कालीन परिस्थितीत.',
-      safeExplanation: 'फक्त गरजेच्या वेळी हातावर स्पर्श करू शकतात.',
-      unsafeExplanation: 'गोपनीय भागांवर स्पर्श कधीही स्वीकार्य नाही.'
-    },
-    'शिक्षक': {
-      safe: ['shoulder', 'arm'],
-      unsafe: ['head', 'chest', 'stomach', 'leg', 'private', 'back'],
-      description: 'शिक्षकांचा स्पर्श फक्त विशिष्ट भागांवर.',
-      safeExplanation: 'शैक्षणिक मार्गदर्शनासाठी खांदा/हातावर स्पर्श करू शकतात.',
-      unsafeExplanation: 'इतर भागांवर स्पर्श स्वीकार्य नाही.'
-    },
-    'मित्र': {
-      safe: ['shoulder', 'arm'],
-      unsafe: ['head', 'chest', 'stomach', 'leg', 'private', 'back'],
-      description: 'मित्रांचा स्पर्श फक्त हातावर, खांद्यावर.',
-      safeExplanation: 'मैत्रीच्या बंधनासाठी हातावर/खांद्यावर स्पर्श करू शकतात.',
-      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
-    },
-    'अनोळखी': {
-      safe: [],
-      unsafe: ['head', 'shoulder', 'chest', 'stomach', 'arm', 'leg', 'private', 'back'],
-      description: 'अनोळखी व्यक्तीचा कोणताही स्पर्श धोकादायक.',
-      safeExplanation: '',
-      unsafeExplanation: 'अज्ञात व्यक्तींकडून कोणताही स्पर्श धोकादायक.'
-    },
-    'डॉक्टर': {
-      safe: ['head', 'chest', 'stomach', 'arm', 'leg', 'private', 'back'],
-      unsafe: [],
-      description: 'डॉक्टरांचा स्पर्श फक्त वैद्यकीय गरजेसाठी.',
-      safeExplanation: 'वैद्यकीय तपासणीसाठी सर्व भागांवर स्पर्श करू शकतात.',
-      unsafeExplanation: ''
-    },
-  };
-
-  // Handle person selection for circle
-  const handlePersonSelect = (person) => {
-    if (selectedPeople.includes(person.id)) {
-      setSelectedPeople(selectedPeople.filter(id => id !== person.id));
-      setFeedback(`${person.name} वर्तुळातून काढले.`);
-    } else {
-      setSelectedPeople([...selectedPeople, person.id]);
-      setFeedback(`${person.name} वर्तुळात समाविष्ट केले.`);
+  const playAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();     // restart audio
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
     }
   };
 
   // Complete circle creation
   const handleCompleteCircle = () => {
     const trustedRelationships = ['family', 'doctor', 'teacher', 'guard', 'friends'];
+
     const selectedTrusted = selectedPeople.filter(id => {
       const person = people.find(p => p.id === id);
       return person && trustedRelationships.includes(person.relationship);
     }).length;
-    
+
+    // 👇 NEW PART (only this is added)
+    setAudioSrc(head);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    }
+
     const selectedStrangers = selectedPeople.filter(id => {
       const person = people.find(p => p.id === id);
       return person && person.relationship === 'stranger';
@@ -292,6 +174,170 @@ const playAudio = () => {
   const testProgress = selectedPeople.length > 0 
     ? Math.round((testedPeople.length / selectedPeople.length) * 100)
     : 0;
+
+  // Handle person selection for circle
+  const handlePersonSelect = (person) => {
+    if (selectedPeople.includes(person.id)) {
+      setSelectedPeople(selectedPeople.filter(id => id !== person.id));
+      setFeedback(`${person.name} वर्तुळातून काढले.`);
+    } else {
+      setSelectedPeople([...selectedPeople, person.id]);
+      setFeedback(`${person.name} वर्तुळात समाविष्ट केले.`);
+    }
+  };
+
+  // Body parts with safety information
+  const bodyParts = [
+    { id: 'head', name: 'डोके', emoji: '🧠', safeFor: ['family', 'doctor'], isSensitive: false },
+    { id: 'shoulder', name: 'खांदा', emoji: '💪', safeFor: ['family', 'friends', 'teacher'], isSensitive: false },
+    { id: 'chest', name: 'छाती', emoji: '❤️', safeFor: ['family', 'doctor'], isSensitive: true },
+    { id: 'stomach', name: 'पोट', emoji: '🩹', safeFor: ['family', 'doctor'], isSensitive: true },
+    { id: 'arm', name: 'हात', emoji: '🤚', safeFor: ['family', 'friends', 'teacher', 'guard'], isSensitive: false },
+    { id: 'leg', name: 'पाय', emoji: '🦵', safeFor: ['family', 'friends', 'teacher', 'guard'], isSensitive: false },
+    { id: 'private', name: 'खाजगी भाग', emoji: '🛡️', safeFor: ['doctor'], isSensitive: true },
+    { id: 'back', name: 'पाठ', emoji: '🔙', safeFor: ['family', 'doctor'], isSensitive: true },
+  ];
+
+  // People with their relationship types
+  const people = [
+    { id: 1, name: 'आई', emoji: '👩', relationship: 'family' },
+    { id: 2, name: 'वडील', emoji: '👨', relationship: 'family' },
+    { id: 3, name: 'आजी', emoji: '👵', relationship: 'family' },
+    { id: 4, name: 'आजोबा', emoji: '👴', relationship: 'family' },
+    { id: 5, name: 'भाऊ', emoji: '👦', relationship: 'family' },
+    { id: 6, name: 'बहीण', emoji: '👧', relationship: 'family' },
+    { id: 7, name: 'शेजारी', emoji: '🧑', relationship: 'stranger' },
+    { id: 8, name: 'शिपाई', emoji: '💂', relationship: 'guard' },
+    { id: 9, name: 'शिक्षक', emoji: '👩‍🏫', relationship: 'teacher' },
+    { id: 10, name: 'मित्र', emoji: '🧒', relationship: 'friends' },
+    { id: 11, name: 'अनोळखी', emoji: '🙍', relationship: 'stranger' },
+    { id: 12, name: 'डॉक्टर', emoji: '👩‍⚕️', relationship: 'doctor' },
+  ];
+
+  // Touch safety rules - Detailed rules for each person
+  const touchRules = {
+    'आई': {
+      safe: ['head', 'shoulder', 'chest', 'stomach', 'arm', 'leg', 'back'],
+      unsafe: ['private'],
+      description: 'आईचा स्पर्श बहुतेक भागांवर सुरक्षित आहे, पण खाजगी भागांवर नाही.',
+      safeExplanation: 'आई तुमच्या काळजीसाठी स्पर्श करू शकते.',
+      unsafeExplanation: 'खाजगी भागांवर कोणाचाही स्पर्श स्वीकार्य नाही.'
+    },
+    'वडील': {
+      safe: ['head', 'shoulder', 'arm', 'leg'],
+      unsafe: ['chest', 'stomach', 'private', 'back'],
+      description: 'वडिलांचा स्पर्श काही भागांवर सुरक्षित आहे.',
+      safeExplanation: 'वडील तुमचे मार्गदर्शन करण्यासाठी स्पर्श करू शकतात.',
+      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
+    },
+    'आजी': {
+      safe: ['head', 'shoulder', 'arm', 'leg', 'back'],
+      unsafe: ['chest', 'stomach', 'private'],
+      description: 'आजीचा स्पर्श बहुतेक भागांवर सुरक्षित आहे.',
+      safeExplanation: 'आजी तुमची काळजी घेण्यासाठी स्पर्श करू शकते.',
+      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
+    },
+    'आजोबा': {
+      safe: ['head', 'shoulder', 'arm', 'leg'],
+      unsafe: ['chest', 'stomach', 'private', 'back'],
+      description: 'आजोबांचा स्पर्श काही भागांवर सुरक्षित आहे.',
+      safeExplanation: 'आजोबा तुमचे मार्गदर्शन करण्यासाठी स्पर्श करू शकतात.',
+      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
+    },
+    'भाऊ': {
+      safe: ['shoulder', 'arm', 'leg'],
+      unsafe: ['head', 'chest', 'stomach', 'private', 'back'],
+      description: 'भावाचा स्पर्श मर्यादित भागांवर सुरक्षित आहे.',
+      safeExplanation: 'भाऊ खेळण्यासाठी किंवा मदतीसाठी स्पर्श करू शकतो.',
+      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
+    },
+    'बहीण': {
+      safe: ['head', 'shoulder', 'arm', 'leg', 'back'],
+      unsafe: ['chest', 'stomach', 'private'],
+      description: 'बहिणीचा स्पर्श बहुतेक भागांवर सुरक्षित आहे.',
+      safeExplanation: 'बहीण तुमची मदत करण्यासाठी स्पर्श करू शकते.',
+      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
+    },
+    'शेजारी': {
+      safe: [],
+      unsafe: ['head', 'shoulder', 'chest', 'stomach', 'arm', 'leg', 'private', 'back'],
+      description: 'शेजाऱ्यांचा कोणताही स्पर्श सुरक्षित नाही.',
+      safeExplanation: '',
+      unsafeExplanation: 'अपरिचित व्यक्तींचा स्पर्श नेहमी धोकादायक.'
+    },
+    'शिपाई': {
+      safe: ['arm'],
+      unsafe: ['head', 'shoulder', 'chest', 'stomach', 'leg', 'private', 'back'],
+      description: 'रक्षकांचा स्पर्श फक्त आपत्कालीन परिस्थितीत.',
+      safeExplanation: 'फक्त गरजेच्या वेळी हातावर स्पर्श करू शकतात.',
+      unsafeExplanation: 'गोपनीय भागांवर स्पर्श कधीही स्वीकार्य नाही.'
+    },
+    'शिक्षक': {
+      safe: ['shoulder', 'arm'],
+      unsafe: ['head', 'chest', 'stomach', 'leg', 'private', 'back'],
+      description: 'शिक्षकांचा स्पर्श फक्त विशिष्ट भागांवर.',
+      safeExplanation: 'शैक्षणिक मार्गदर्शनासाठी खांदा/हातावर स्पर्श करू शकतात.',
+      unsafeExplanation: 'इतर भागांवर स्पर्श स्वीकार्य नाही.'
+    },
+    'मित्र': {
+      safe: ['shoulder', 'arm'],
+      unsafe: ['head', 'chest', 'stomach', 'leg', 'private', 'back'],
+      description: 'मित्रांचा स्पर्श फक्त हातावर, खांद्यावर.',
+      safeExplanation: 'मैत्रीच्या बंधनासाठी हातावर/खांद्यावर स्पर्श करू शकतात.',
+      unsafeExplanation: 'गोपनीय भागांवर स्पर्श स्वीकार्य नाही.'
+    },
+    'अनोळखी': {
+      safe: [],
+      unsafe: ['head', 'shoulder', 'chest', 'stomach', 'arm', 'leg', 'private', 'back'],
+      description: 'अनोळखी व्यक्तीचा कोणताही स्पर्श धोकादायक.',
+      safeExplanation: '',
+      unsafeExplanation: 'अज्ञात व्यक्तींकडून कोणताही स्पर्श धोकादायक.'
+    },
+    'डॉक्टर': {
+      safe: ['head', 'chest', 'stomach', 'arm', 'leg', 'private', 'back'],
+      unsafe: [],
+      description: 'डॉक्टरांचा स्पर्श फक्त वैद्यकीय गरजेसाठी.',
+      safeExplanation: 'वैद्यकीय तपासणीसाठी सर्व भागांवर स्पर्श करू शकतात.',
+      unsafeExplanation: ''
+    },
+  };
+
+  // Helper functions
+  const getRelationshipColor = (relationship) => {
+    switch(relationship) {
+      case 'family': return 'bg-green-100 text-green-800';
+      case 'friends': return 'bg-blue-100 text-blue-800';
+      case 'teacher': return 'bg-blue-100 text-blue-800';
+      case 'doctor': return 'bg-purple-100 text-purple-800';
+      case 'guard': return 'bg-purple-100 text-purple-800';
+      case 'stranger': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getRelationshipText = (relationship) => {
+    switch(relationship) {
+      case 'family': return 'कुटुंब';
+      case 'friends': return 'मित्र';
+      case 'teacher': return 'शिक्षक';
+      case 'doctor': return 'डॉक्टर';
+      case 'guard': return 'रक्षक';
+      case 'stranger': return 'अपरिचित';
+      default: return 'इतर';
+    }
+  };
+
+  const getPersonBgColor = (relationship) => {
+    switch(relationship) {
+      case 'family': return 'bg-green-200';
+      case 'friends': return 'bg-blue-200';
+      case 'teacher': return 'bg-blue-200';
+      case 'doctor': return 'bg-purple-200';
+      case 'guard': return 'bg-purple-200';
+      case 'stranger': return 'bg-red-200';
+      default: return 'bg-gray-200';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-purple-50 p-3">
@@ -787,7 +833,7 @@ const playAudio = () => {
           </div>
         )}
 
-      <NextLevel/>
+        <NextLevel/>
 
         {/* Global Actions */}
         <div className="mt-4 flex justify-between items-center">
@@ -797,9 +843,9 @@ const playAudio = () => {
           >
             🔊 ऐका
           </button>
-          <audio ref={audioRef} src={faithCircleAudio} />
 
-          
+          <audio ref={audioRef} src={audioSrc} />
+
           <div className="text-xs text-gray-500">
             COEP Sparshadhyan प्रकल्प
           </div>
@@ -807,43 +853,6 @@ const playAudio = () => {
       </div>
     </div>
   );
-};
-
-// Helper functions
-const getRelationshipColor = (relationship) => {
-  switch(relationship) {
-    case 'family': return 'bg-green-100 text-green-800';
-    case 'friends': return 'bg-blue-100 text-blue-800';
-    case 'teacher': return 'bg-blue-100 text-blue-800';
-    case 'doctor': return 'bg-purple-100 text-purple-800';
-    case 'guard': return 'bg-purple-100 text-purple-800';
-    case 'stranger': return 'bg-red-100 text-red-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
-
-const getRelationshipText = (relationship) => {
-  switch(relationship) {
-    case 'family': return 'कुटुंब';
-    case 'friends': return 'मित्र';
-    case 'teacher': return 'शिक्षक';
-    case 'doctor': return 'डॉक्टर';
-    case 'guard': return 'रक्षक';
-    case 'stranger': return 'अपरिचित';
-    default: return 'इतर';
-  }
-};
-
-const getPersonBgColor = (relationship) => {
-  switch(relationship) {
-    case 'family': return 'bg-green-200';
-    case 'friends': return 'bg-blue-200';
-    case 'teacher': return 'bg-blue-200';
-    case 'doctor': return 'bg-purple-200';
-    case 'guard': return 'bg-purple-200';
-    case 'stranger': return 'bg-red-200';
-    default: return 'bg-gray-200';
-  }
 };
 
 export default Level2;
