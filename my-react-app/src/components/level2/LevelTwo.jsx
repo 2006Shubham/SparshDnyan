@@ -20,11 +20,12 @@ const Level2 = ({ onLevelComplete }) => {
   const [currentBodyPart, setCurrentBodyPart] = useState(null);
   const [testingComplete, setTestingComplete] = useState(false);
 
-  const audioRef = React.useRef(null);
 
   function handleClick() {
     navigate('/level3');
   }
+
+  const audioRef = React.useRef(null);
 
   const playAudio = () => {
     if (audioRef.current) {

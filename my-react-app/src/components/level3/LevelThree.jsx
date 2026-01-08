@@ -1,13 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import reflex from "../../assets/audio/reflex.mp3"
 
 const LevelThree = ({ onLevelComplete }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+
+
   // Dummy image path - replace this with your actual image path
   const imagePath = "/body-parts/step.png";
+
+  const audioRef = React.useRef(null);
+  
+    const playAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.pause();     // restart audio
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+    };
 
   
   const handleButtonClick = () => {
@@ -128,7 +141,8 @@ const LevelThree = ({ onLevelComplete }) => {
                 </>
               )}
             </div>
-            
+
+         
             {/* Button Effects */}
             {!isLoading && (
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
@@ -141,8 +155,18 @@ const LevelThree = ({ onLevelComplete }) => {
           </p>
         </div>
 
-        
+         <div className="mt-4 flex justify-between items-center">
+          <button
+            onClick={playAudio}
+            className="text-sm text-purple-600 hover:text-purple-800"
+          >
+            🔊 ऐका
+          </button>
 
+          <audio ref={audioRef} src={reflex} />
+
+          </div>
+        
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
           <p>COEP Sparshadhyan प्रकल्प • Child Safety Education Platform</p>
