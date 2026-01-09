@@ -1,22 +1,33 @@
-import React, { useState, useEffect } from "react";
-import info5 from "../../assets/audio/info5.mp3"
+import React, { useState, useEffect, useRef } from "react";
+import info5 from "../../assets/audio/info5.mp3";
 import { useNavigate } from "react-router-dom";
-const LevelFive = () => {
+import html2canvas from "html2canvas";
 
+const LevelFive = () => {
   const [currentSection, setCurrentSection] = useState("intro");
   const [flippedCards, setFlippedCards] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [userName, setUserName] = useState("");
   const navigate = useNavigate();
 
-
-
   const audioRef = React.useRef(null);
+  const certificateRef = React.useRef(null);
+
+  // Get user name from localStorage on component mount
+  useEffect(() => {
+    const savedName = localStorage.getItem("userName");
+    if (savedName) {
+      setUserName(savedName);
+    } else {
+      setUserName("मित्रा");
+    }
+  }, []);
 
   const playAudio = () => {
     if (audioRef.current) {
-      audioRef.current.pause();     // restart audio
+      audioRef.current.pause();
       audioRef.current.currentTime = 0;
       audioRef.current.play();
     }
@@ -32,7 +43,7 @@ const LevelFive = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Module sections
+  // Module sections - updated to include certificate
   const sections = {
     intro: "परिचय",
     privateParts: "खाजगी अवयव",
@@ -40,7 +51,8 @@ const LevelFive = () => {
     pocsoLaw: "POCSO कायदा",
     helpNumbers: "मदत क्रमांक",
     scenario: "परिस्थिती",
-    ending: "समापन"
+    ending: "समापन",
+    certificate: "प्रमाणपत्र"
   };
 
   // Private body parts information
@@ -226,6 +238,128 @@ const LevelFive = () => {
     }
   };
 
+  // Download certificate as PNG
+  const downloadCertificatePNG = () => {
+    const certificateElement = certificateRef.current;
+
+    if (!certificateElement) return;
+
+    // Temporarily adjust for image capture
+    const originalWidth = certificateElement.style.width;
+    const originalHeight = certificateElement.style.height;
+
+    certificateElement.style.width = '1200px';
+    certificateElement.style.height = 'auto';
+
+    html2canvas(certificateElement, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#fef3c7',
+      logging: false,
+    }).then(canvas => {
+      // Restore original styles
+      certificateElement.style.width = originalWidth;
+      certificateElement.style.height = originalHeight;
+
+      const link = document.createElement('a');
+      link.download = `स्पर्शज्ञान-प्रमाणपत्र-${userName}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  };
+
+  // Print certificate function
+  const printCertificate = () => {
+    const certificateElement = certificateRef.current;
+    if (!certificateElement) return;
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('कृपया पॉप-अप ब्लॉकर डिसेबल करा आणि पुन्हा प्रयत्न करा');
+      return;
+    }
+
+    // Get the certificate HTML
+    const certificateHTML = certificateElement.innerHTML;
+
+    // Create print document with proper styling
+    const printDocument = `
+      <!DOCTYPE html>
+      <html lang="mr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>स्पर्शज्ञान प्रमाणपत्र - ${userName}</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <style>
+          @media print {
+            body {
+              margin: 0;
+              padding: 0;
+              background-color: #fef3c7 !important;
+            }
+            .certificate-container {
+              width: 100% !important;
+              height: 100vh !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              display: flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+            }
+            .certificate-content {
+              transform: scale(0.95) !important;
+              transform-origin: center !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+          }
+          @page {
+            margin: 0;
+            size: A4 landscape;
+          }
+          body {
+            font-family: 'Arial', 'Noto Sans Devanagari', sans-serif;
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="certificate-container">
+          <div class="certificate-content">
+            ${certificateHTML}
+          </div>
+        </div>
+        <script>
+          // Auto-print when window loads
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              };
+            }, 500);
+          };
+          
+          // Fallback close after 10 seconds
+          setTimeout(function() {
+            window.close();
+          }, 10000);
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(printDocument);
+    printWindow.document.close();
+  };
+
   // Render Intro Screen
   const renderIntro = () => (
     <div className="h-full flex flex-col items-center justify-center p-4 text-center">
@@ -264,6 +398,10 @@ const LevelFive = () => {
             <span className="text-green-500">✓</span>
             <span>योग्य कृती करणे शिकणे</span>
           </li>
+          <li className="flex items-center gap-2">
+            <span className="text-yellow-500">🏆</span>
+            <span className="font-semibold">प्रमाणपत्र मिळवणे</span>
+          </li>
         </ul>
       </div>
 
@@ -278,8 +416,6 @@ const LevelFive = () => {
 
   // Render Private Parts Section
   const renderPrivateParts = () => (
-
-
     <div className="h-full flex flex-col p-4">
       <h1 className="text-xl sm:text-2xl font-bold text-blue-800 text-center mb-4">
         तुमचे शरीर - तुमचा अधिकार 👤
@@ -294,10 +430,10 @@ const LevelFive = () => {
             <div
               key={index}
               className={`flex flex-col items-center p-3 rounded-xl ${part.private
-                  ? part.warning
-                    ? 'bg-red-50 border-2 border-red-300'
-                    : 'bg-pink-50 border-2 border-pink-300'
-                  : 'bg-blue-50 border-2 border-blue-200'
+                ? part.warning
+                  ? 'bg-red-50 border-2 border-red-300'
+                  : 'bg-pink-50 border-2 border-pink-300'
+                : 'bg-blue-50 border-2 border-blue-200'
                 }`}
             >
               <div className="text-3xl mb-2">{part.emoji}</div>
@@ -414,11 +550,7 @@ const LevelFive = () => {
 
   // Render POCSO Law Section
   const renderPOCSOLaw = () => (
-
-
-
     <div className="h-full flex flex-col p-4">
-
       <h1 className="text-xl sm:text-2xl font-bold text-blue-800 text-center mb-4">
         {pocsoInfo.title} {pocsoInfo.emoji}
       </h1>
@@ -492,9 +624,6 @@ const LevelFive = () => {
 
   // Render Help Numbers Section
   const renderHelpNumbers = () => (
-
-
-
     <div className="h-full flex flex-col p-4">
       <h1 className="text-xl sm:text-2xl font-bold text-blue-800 text-center mb-4">
         मदत क्रमांक - तुमची सुरक्षा 📞
@@ -615,18 +744,18 @@ const LevelFive = () => {
               key={index}
               onClick={() => handleAnswerSelect(index)}
               className={`w-full text-left p-3 rounded-lg transition-all duration-300 ${selectedAnswer === index
-                  ? option.correct
-                    ? 'bg-green-100 border-2 border-green-400'
-                    : 'bg-red-100 border-2 border-red-400'
-                  : 'bg-white hover:bg-gray-50 border border-gray-200'
+                ? option.correct
+                  ? 'bg-green-100 border-2 border-green-400'
+                  : 'bg-red-100 border-2 border-red-400'
+                : 'bg-white hover:bg-gray-50 border border-gray-200'
                 }`}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedAnswer === index
-                    ? option.correct
-                      ? 'bg-green-500 text-white'
-                      : 'bg-red-500 text-white'
-                    : 'bg-gray-200'
+                  ? option.correct
+                    ? 'bg-green-500 text-white'
+                    : 'bg-red-500 text-white'
+                  : 'bg-gray-200'
                   }`}>
                   {selectedAnswer === index && (option.correct ? '✓' : '✗')}
                 </div>
@@ -638,8 +767,8 @@ const LevelFive = () => {
 
         {showFeedback && selectedAnswer !== null && (
           <div className={`rounded-xl p-4 mb-4 animate-pulse ${scenarios[0].options[selectedAnswer].correct
-              ? 'bg-green-50 border border-green-200'
-              : 'bg-red-50 border border-red-200'
+            ? 'bg-green-50 border border-green-200'
+            : 'bg-red-50 border border-red-200'
             }`}>
             <div className="flex items-center gap-2">
               <span className="text-xl">
@@ -732,11 +861,202 @@ const LevelFive = () => {
 
         <div className="space-y-3">
           <button
-            onClick={()=>{navigate('/')}}
+            onClick={() => setCurrentSection("certificate")}
+            className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold rounded-full hover:scale-105 transition-transform"
+          >
+            🏆 प्रमाणपत्र मिळवा
+          </button>
+          <button
+            onClick={() => { navigate('/') }}
             className="w-full px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-800 text-white font-bold rounded-full hover:scale-105 transition-transform"
           >
-            पुन्हा खेळा 🔄🏠
+            पुन्हा खेळा 🔄
           </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Render Certificate Section
+  const renderCertificate = () => (
+    <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-amber-50 flex flex-col items-center justify-center p-2 sm:p-4">
+      <div className="w-full max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-800 mb-2">
+            🎉 तुमचे प्रमाणपत्र 🎉
+          </h1>
+          
+          <p className="text-gray-600 text-xs sm:text-sm md:text-base">
+            स्पर्शज्ञान कार्यक्रम यशस्वीरित्या पूर्ण केल्याबद्दल अभिनंदन!
+          </p>
+        </div>
+
+        {/* Certificate Container */}
+        <div className="bg-white rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border-4 sm:border-6 md:border-8 border-yellow-300 mb-4 sm:mb-6">
+          {/* Certificate Design */}
+          <div
+            ref={certificateRef}
+            className="p-3 sm:p-6 md:p-8 bg-gradient-to-br from-yellow-50 via-yellow-100 to-amber-50 min-h-[60vh] sm:min-h-[70vh] flex flex-col relative"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(251, 191, 36, 0.1) 0%, transparent 55%), radial-gradient(circle at 75% 75%, rgba(245, 158, 11, 0.1) 0%, transparent 55%)'
+            }}
+          >
+            {/* Decorative Border Pattern */}
+            <div className="absolute top-0 left-0 right-0 h-1 sm:h-2 bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-1 sm:h-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-amber-400"></div>
+
+            {/* Corner decorations */}
+            <div className="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 border-t-2 sm:border-t-3 md:border-t-4 border-l-2 sm:border-l-3 md:border-l-4 border-amber-400"></div>
+            <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 border-t-2 sm:border-t-3 md:border-t-4 border-r-2 sm:border-r-3 md:border-r-4 border-amber-400"></div>
+            <div className="absolute bottom-0 left-0 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 border-b-2 sm:border-b-3 md:border-b-4 border-l-2 sm:border-l-3 md:border-l-4 border-amber-400"></div>
+            <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 border-b-2 sm:border-b-3 md:border-b-4 border-r-2 sm:border-r-3 md:border-r-4 border-amber-400"></div>
+
+            {/* Certificate Content */}
+            <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-1 sm:px-4 md:px-6">
+              {/* Certificate Header */}
+              <div className="text-center mb-3 sm:mb-6 md:mb-8">
+                <div className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-amber-900 mb-1 sm:mb-2 tracking-wide">
+                  प्रमाणपत्र
+                </div>
+
+                 <div className="text-center order-3">
+                   
+                    <div className="text-xs text-gray-600 mt-1">
+                      <img width={200} height={200} src="/body-parts/sparshdnyan.png" alt="Description" />
+                    </div>
+                  </div>
+
+                <div className="text-xs sm:text-sm md:text-lg lg:text-xl text-amber-700 mb-2 sm:mb-3">
+                  स्पर्शज्ञान बाल सुरक्षा प्रशिक्षण
+                </div>
+                <div className="h-0.5 sm:h-1 w-3/4 mx-auto bg-gradient-to-r from-amber-400 to-orange-400 rounded-full"></div>
+              </div>
+
+              {/* Main Certificate Body */}
+              <div className="text-center w-full max-w-2xl">
+                <p className="text-xs sm:text-sm md:text-base text-gray-700 mb-3 sm:mb-6">
+                  या प्रमाणपत्राने प्रमाणित केले जाते की
+                </p>
+
+                {/* Name Display */}
+                <div className="my-3 sm:my-6 md:my-8 lg:my-10">
+                  <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-purple-800 mb-1 sm:mb-2 px-2 sm:px-4 py-2 sm:py-3 md:py-4 lg:py-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg sm:rounded-xl md:rounded-2xl border border-purple-200 shadow-inner">
+                    {userName}
+                  </div>
+                  <div className="w-3/4 mx-auto h-0.5 sm:h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mt-1 sm:mt-2 md:mt-3 lg:mt-4"></div>
+                </div>
+
+                <p className="text-xs sm:text-sm md:text-base text-gray-800 mb-3 sm:mb-6 leading-relaxed px-1 sm:px-2">
+                  यांनी "स्पर्शज्ञान - शरीर ओळखा" या बाल सुरक्षा प्रशिक्षण कार्यक्रमात
+                  सर्व विषय यशस्वीरित्या पूर्ण केले आहेत.
+                </p>
+
+                {/* Achievement Details */}
+                <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 mb-3 sm:mb-6 border border-blue-200">
+                  <h3 className="font-bold text-blue-800 text-xs sm:text-sm md:text-base lg:text-lg mb-1 sm:mb-2">
+                    📚 कार्यक्रमात समाविष्ट विषय:
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm">
+                    <div className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-green-500 text-sm sm:text-base">✓</span>
+                      <span className="text-left">शरीराचे खाजगी अवयव</span>
+                    </div>
+                    <div className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-green-500 text-sm sm:text-base">✓</span>
+                      <span className="text-left">चांगला-वाईट स्पर्श ओळख</span>
+                    </div>
+                    <div className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-green-500 text-sm sm:text-base">✓</span>
+                      <span className="text-left">POCSO कायद्याची माहिती</span>
+                    </div>
+                    <div className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-green-500 text-sm sm:text-base">✓</span>
+                      <span className="text-left">मदत क्रमांक आणि सुरक्षा</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote */}
+                <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-10">
+                  <p className="text-xs sm:text-sm text-gray-700 italic px-2 sm:px-4 font-medium">
+                    "तुमचे शरीर - तुमचा अधिकार, तुमची सुरक्षा - तुमची जबाबदारी"
+                  </p>
+                </div>
+              </div>
+
+              {/* Certificate Footer */}
+              <div className="w-full border-t border-amber-300 pt-2 sm:pt-4 md:pt-6 mt-2 sm:mt-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 md:gap-8">
+                  {/* Date */}
+                  <div className="text-center sm:text-left order-2 sm:order-1">
+                    <div className="font-bold text-gray-800 text-xs sm:text-sm">दिनांक:</div>
+                    <div className="text-gray-700 text-xs sm:text-sm">
+                      {new Date().toLocaleDateString('mr-IN', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Signature */}
+                  <div className="text-center order-1 sm:order-2 mb-2 sm:mb-0">
+                    <div className="font-bold text-gray-800 text-xs sm:text-sm mb-1">सही</div>
+                    <div className="w-16 sm:w-20 h-0.5 bg-gray-800 mx-auto mb-1"></div>
+                    <div className="text-gray-700 font-semibold text-xs sm:text-sm">स्पर्शज्ञान प्रकल्प</div>
+                  </div>
+
+                  {/* Seal */}
+                 
+                </div>
+              </div>
+
+              {/* Watermark */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-200 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold opacity-10 -z-10 pointer-events-none select-none rotate-[-15deg]">
+                सुरक्षा
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 md:gap-4 justify-center mb-4 sm:mb-6">
+          <button
+            onClick={printCertificate}
+            className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg sm:rounded-xl hover:scale-105 transition-transform shadow-lg flex items-center justify-center gap-1 sm:gap-2 hover:from-green-600 hover:to-emerald-700"
+          >
+            <span className="text-lg">🖨️</span>
+            <span className="text-xs sm:text-sm md:text-base">प्रिंट करा</span>
+          </button>
+
+
+
+          <button
+            onClick={() => navigate('/')}
+            className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg sm:rounded-xl hover:scale-105 transition-transform shadow-lg flex items-center justify-center gap-1 sm:gap-2 hover:from-purple-600 hover:to-pink-600"
+          >
+            <span className="text-lg">🏠</span>
+            <span className="text-xs sm:text-sm md:text-base">मुख्य पृष्ठ</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentSection("ending")}
+            className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-700 text-white font-bold rounded-lg sm:rounded-xl hover:scale-105 transition-transform shadow-lg flex items-center justify-center gap-1 sm:gap-2 hover:from-gray-600 hover:to-gray-800"
+          >
+            <span className="text-lg">←</span>
+            <span className="text-xs sm:text-sm md:text-base">मागे</span>
+          </button>
+        </div>
+
+        {/* Instructions */}
+        <div className="text-center">
+          <div className="bg-gradient-to-r from-yellow-100 to-amber-100 rounded-lg p-2 sm:p-3 md:p-4 inline-block max-w-lg">
+            <p className="text-xs text-gray-700 flex items-center justify-center gap-1 sm:gap-2">
+              <span className="text-red-500 text-sm">ℹ️</span>
+              प्रिंट करण्यासाठी बटण दाबा, प्रिंट डायलॉगमध्ये "मार्जिन" → "काहीही नाही" निवडा आणि "प्रिंट" दाबा.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -752,77 +1072,68 @@ const LevelFive = () => {
       case "helpNumbers": return renderHelpNumbers();
       case "scenario": return renderScenario();
       case "ending": return renderEnding();
+      case "certificate": return renderCertificate();
       default: return renderIntro();
     }
   };
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 overflow-hidden"
-      style={{ minHeight: '100vh' }}
-    >
-      <div className="h-full flex flex-col max-w-md mx-auto">
-        {/* Progress Bar */}
-        {currentSection !== "intro" && currentSection !== "ending" && (
-          <div className="px-4 pt-4 pb-2">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs text-gray-600">
-                {sections[currentSection]}
-              </span>
-              <span className="text-xs text-gray-500">
-                {Object.keys(sections).indexOf(currentSection)}/{Object.keys(sections).length - 2}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div
-                className="bg-gradient-to-r from-green-400 to-blue-500 h-1 rounded-full transition-all duration-500"
-                style={{
-                  width: `${((Object.keys(sections).indexOf(currentSection)) / (Object.keys(sections).length - 2)) * 100}%`
-                }}
-              ></div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 overflow-auto">
+      {/* Only show progress bar for main sections, not for certificate */}
+      {currentSection !== "intro" && currentSection !== "ending" && currentSection !== "certificate" && (
+        <div className="px-4 pt-4 pb-2 max-w-md mx-auto">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs text-gray-600">
+              {sections[currentSection]}
+            </span>
+            <span className="text-xs text-gray-500">
+              {Object.keys(sections).indexOf(currentSection)}/{Object.keys(sections).length - 3}
+            </span>
           </div>
-        )}
-
-        {/* Main Content */}
-        <div className="flex-1 overflow-hidden px-4">
-          {renderContent()}
+          <div className="w-full bg-gray-200 rounded-full h-1">
+            <div
+              className="bg-gradient-to-r from-green-400 to-blue-500 h-1 rounded-full transition-all duration-500"
+              style={{
+                width: `${((Object.keys(sections).indexOf(currentSection)) / (Object.keys(sections).length - 3)) * 100}%`
+              }}
+            ></div>
+          </div>
         </div>
+      )}
 
-        {/* Bottom Info */}
-        <div className="px-4 py-3">
+      {/* Main Content */}
+      <div className={`${currentSection === "certificate" ? "" : "max-w-md mx-auto"} px-2 sm:px-4`}>
+        {renderContent()}
+      </div>
+
+      {/* Bottom Info - Hide for certificate */}
+      {currentSection !== "certificate" && currentSection !== "intro" && (
+        <div className="px-4 py-3 max-w-md mx-auto">
           <p className="text-center text-xs text-gray-500">
             "घेऊया शिक्षणाचे धन, रोग अज्ञानापासून लांब"
           </p>
         </div>
-      </div>
+      )}
 
+      {/* Audio button for intro */}
       {currentSection === "intro" && (
-        <div className="mt-4 ml-4 flex justify-between items-center">
+        <div className="mt-4 ml-4 flex justify-between items-center max-w-md mx-auto">
           <button
             onClick={playAudio}
             className="text-sm text-purple-600 hover:text-purple-800"
           >
             🔊 ऐका
           </button>
-
           <audio ref={audioRef} src={info5} />
         </div>
       )}
 
-
-      {/* Footer */}
-      <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
+      {/* Footer - Hide for certificate */}
+      {currentSection !== "certificate" && (
+        <div className="mt-4 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 text-center text-gray-500 text-sm max-w-md mx-auto">
           <p>COEP Sparshadhyan प्रकल्प • Child Safety Education Platform</p>
         </div>
-
-      {/* Mobile-specific styles */}
-      <style jsx>{`
-        @media (max-height: 600px) {
-          .text-sm { font-size: 0.75rem; }
-          .text-base { font-size: 0.875rem; }
-        }
-      `}</style>
+      )}
     </div>
   );
 };
