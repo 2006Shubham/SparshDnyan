@@ -268,7 +268,7 @@ const LevelFive = () => {
     });
   };
 
-  // Print certificate function
+  // Improved print certificate function for both mobile and desktop
   const printCertificate = () => {
     const certificateElement = certificateRef.current;
     if (!certificateElement) return;
@@ -276,57 +276,117 @@ const LevelFive = () => {
     // Create a new window for printing
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-      alert('कृपया पॉप-अप ब्लॉकर डिसेबल करा आणि पुन्हा प्रयत्न करा');
+      // If popup is blocked, try direct printing
+      tryDirectPrint();
       return;
     }
 
     // Get the certificate HTML
     const certificateHTML = certificateElement.innerHTML;
 
-    // Create print document with proper styling
+    // Create print document with responsive styling
     const printDocument = `
       <!DOCTYPE html>
       <html lang="mr">
       <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>स्पर्शज्ञान प्रमाणपत्र - ${userName}</title>
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
         <style>
           @media print {
             body {
-              margin: 0;
-              padding: 0;
-              background-color: #fef3c7 !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%) !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
+            }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
             }
             .certificate-container {
               width: 100% !important;
-              height: 100vh !important;
+              min-height: 100vh !important;
               margin: 0 !important;
-              padding: 0 !important;
+              padding: 20px !important;
               display: flex !important;
               align-items: center !important;
               justify-content: center !important;
+              background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%) !important;
             }
             .certificate-content {
-              transform: scale(0.95) !important;
+              transform: scale(0.9) !important;
               transform-origin: center !important;
+              width: 100% !important;
+              max-width: 800px !important;
+              margin: 0 auto !important;
             }
             .no-print {
               display: none !important;
             }
+            img {
+              max-width: 100% !important;
+              height: auto !important;
+            }
           }
+          
           @page {
             margin: 0;
-            size: A4 landscape;
+            size: ${isMobile ? 'portrait' : 'landscape'};
           }
+          
           body {
-            font-family: 'Arial', 'Noto Sans Devanagari', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
             min-height: 100vh;
+            margin: 0;
+            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+          }
+          
+          .certificate-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          
+          @media (max-width: 768px) {
+            .certificate-content {
+              transform: scale(0.95);
+            }
+            body {
+              padding: 10px;
+            }
+          }
+          
+          @media (max-width: 480px) {
+            .certificate-content {
+              transform: scale(0.85);
+            }
+          }
+          
+          /* Force color rendering */
+          .bg-gradient-to-br {
+            background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)) !important;
+          }
+          
+          .from-yellow-50 {
+            --tw-gradient-from: #fefce8 !important;
+          }
+          
+          .to-amber-50 {
+            --tw-gradient-to: #fffbeb !important;
+          }
+          
+          .border-yellow-300 {
+            border-color: #fcd34d !important;
           }
         </style>
       </head>
@@ -339,18 +399,38 @@ const LevelFive = () => {
         <script>
           // Auto-print when window loads
           window.onload = function() {
+            // Focus the window for better mobile printing
+            window.focus();
+            
+            // Add a slight delay to ensure all content is loaded
             setTimeout(function() {
-              window.print();
+              try {
+                window.print();
+              } catch (error) {
+                console.error('Print failed:', error);
+                // Fallback: show instructions
+                document.body.innerHTML = '<div style="text-align: center; padding: 20px;"><h3>Print Instructions</h3><p>Please use browser menu to print:</p><p>1. Tap menu (⋯)</p><p>2. Select "Print"</p><p>3. Choose your printer</p></div>';
+              }
+              
+              // Close window after printing or after timeout
               window.onafterprint = function() {
-                window.close();
+                setTimeout(function() {
+                  window.close();
+                }, 1000);
               };
-            }, 500);
+              
+              // Fallback close after 15 seconds
+              setTimeout(function() {
+                window.close();
+              }, 15000);
+            }, 1000);
           };
           
-          // Fallback close after 10 seconds
-          setTimeout(function() {
-            window.close();
-          }, 10000);
+          // Handle before print event
+          window.onbeforeprint = function() {
+            // Ensure all styles are applied
+            document.body.style.visibility = 'visible';
+          };
         </script>
       </body>
       </html>
@@ -358,6 +438,83 @@ const LevelFive = () => {
 
     printWindow.document.write(printDocument);
     printWindow.document.close();
+  };
+
+  // Alternative direct printing method for mobile
+  const tryDirectPrint = () => {
+    const certificateElement = certificateRef.current;
+    if (!certificateElement) return;
+
+    // Create a temporary container for printing
+    const printContainer = document.createElement('div');
+    printContainer.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      z-index: 9999;
+      overflow: auto;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+    
+    // Clone the certificate element
+    const certificateClone = certificateElement.cloneNode(true);
+    certificateClone.style.cssText = `
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      transform: scale(0.9);
+      transform-origin: center;
+    `;
+    
+    printContainer.appendChild(certificateClone);
+    document.body.appendChild(printContainer);
+    
+    // Show print instructions for mobile
+    const instructions = document.createElement('div');
+    instructions.innerHTML = `
+      <div style="position: fixed; bottom: 20px; left: 0; right: 0; background: white; padding: 15px; border-radius: 10px; margin: 0 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); text-align: center;">
+        <p style="margin: 0 0 10px; font-weight: bold;">🖨️ प्रिंट करण्यासाठी:</p>
+        <p style="margin: 0 0 5px;">1. ब्राउझर मेनू (⋯) टॅप करा</p>
+        <p style="margin: 0 0 5px;">2. "प्रिंट" निवडा</p>
+        <p style="margin: 0 0 10px;">3. "मार्जिन: काहीही नाही" सेट करा</p>
+        <button onclick="window.print()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin-right: 10px;">प्रिंट करा</button>
+        <button onclick="this.closest('[style*=\\'position: fixed\\']').remove()" style="background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">रद्द करा</button>
+      </div>
+    `;
+    
+    printContainer.appendChild(instructions);
+    
+    // Add a close button
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '✕';
+    closeButton.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 20px;
+      z-index: 10000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+    closeButton.onclick = () => {
+      printContainer.remove();
+    };
+    
+    printContainer.appendChild(closeButton);
   };
 
   // Render Intro Screen
@@ -920,12 +1077,16 @@ const LevelFive = () => {
                   प्रमाणपत्र
                 </div>
 
-                 <div className="text-center order-3">
-                   
-                    <div className="text-xs text-gray-600 mt-1">
-                      <img width={200} height={200} src="/body-parts/sparshdnyan.png" alt="Description" />
-                    </div>
+                {/* Logo Image */}
+                <div className="flex justify-center mb-3">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                    <img 
+                      src="/body-parts/sparshdnyan.png" 
+                      alt="स्पर्शज्ञान लोगो"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
+                </div>
 
                 <div className="text-xs sm:text-sm md:text-lg lg:text-xl text-amber-700 mb-2 sm:mb-3">
                   स्पर्शज्ञान बाल सुरक्षा प्रशिक्षण
@@ -1005,10 +1166,16 @@ const LevelFive = () => {
                     <div className="font-bold text-gray-800 text-xs sm:text-sm mb-1">सही</div>
                     <div className="w-16 sm:w-20 h-0.5 bg-gray-800 mx-auto mb-1"></div>
                     <div className="text-gray-700 font-semibold text-xs sm:text-sm">स्पर्शज्ञान प्रकल्प</div>
+                    <div className="text-xs text-gray-600">COEP, पुणे</div>
                   </div>
 
-                  {/* Seal */}
-                 
+                  {/* Certificate ID */}
+                  <div className="text-center order-3">
+                    <div className="inline-block p-2 sm:p-3 bg-amber-100 rounded-lg">
+                      <div className="text-xs text-amber-800 font-bold">ID: {Date.now().toString().slice(-8)}</div>
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">प्रमाणपत्र क्रमांक</div>
+                  </div>
                 </div>
               </div>
 
@@ -1030,7 +1197,7 @@ const LevelFive = () => {
             <span className="text-xs sm:text-sm md:text-base">प्रिंट करा</span>
           </button>
 
-
+          
 
           <button
             onClick={() => navigate('/')}
@@ -1049,15 +1216,32 @@ const LevelFive = () => {
           </button>
         </div>
 
-        {/* Instructions */}
-        <div className="text-center">
-          <div className="bg-gradient-to-r from-yellow-100 to-amber-100 rounded-lg p-2 sm:p-3 md:p-4 inline-block max-w-lg">
-            <p className="text-xs text-gray-700 flex items-center justify-center gap-1 sm:gap-2">
-              <span className="text-red-500 text-sm">ℹ️</span>
-              प्रिंट करण्यासाठी बटण दाबा, प्रिंट डायलॉगमध्ये "मार्जिन" → "काहीही नाही" निवडा आणि "प्रिंट" दाबा.
-            </p>
+        {/* Mobile-specific instructions */}
+        {isMobile && (
+          <div className="text-center mb-4">
+            <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg p-3 md:p-4 inline-block max-w-lg">
+              <p className="text-xs text-gray-700 flex flex-col items-center gap-1">
+                <span className="text-red-500 text-sm font-bold">📱 मोबाईल प्रिंटिंग:</span>
+                <span>1. प्रिंट बटण दाबा</span>
+                <span>2. ब्राउझर मेनू (⋯) टॅप करा</span>
+                <span>3. "प्रिंट" निवडा</span>
+                <span>4. "मार्जिन: काहीही नाही" सेट करा</span>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Desktop instructions */}
+        {!isMobile && (
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-yellow-100 to-amber-100 rounded-lg p-2 sm:p-3 md:p-4 inline-block max-w-lg">
+              <p className="text-xs text-gray-700 flex items-center justify-center gap-1 sm:gap-2">
+                <span className="text-red-500 text-sm">ℹ️</span>
+                प्रिंट करण्यासाठी बटण दाबा, प्रिंट डायलॉगमध्ये "मार्जिन" → "काहीही नाही" निवडा आणि "प्रिंट" दाबा.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
